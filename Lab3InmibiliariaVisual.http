@@ -1,0 +1,6 @@
+@Lab3InmibiliariaVisual_HostAddress = http://localhost:5216
+
+GET {{Lab3InmibiliariaVisual_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
