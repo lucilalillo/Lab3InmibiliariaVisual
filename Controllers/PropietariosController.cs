@@ -57,7 +57,7 @@ namespace Lab3InmibiliariaVisual.Controllers
                     prf: KeyDerivationPrf.HMACSHA1,
                     iterationCount: 1000,
                     numBytesRequested: 256 / 8));
-                 p = await contexto.Propietarios.FirstOrDefaultAsync(x => x.Email== login.Email);
+                 p = await contexto.Propietarios.FirstOrDefaultAsync(x => x.Email == login.Email);
                 if (p == null || p.Clave != hashed)
                 {
                     return BadRequest("Nombre de usuario o clave incorrecta");
@@ -93,7 +93,7 @@ namespace Lab3InmibiliariaVisual.Controllers
         //PUT api/Controller/5
         //edita los datos del propietario logueado
         [HttpPut()]
-        public async Task<IActionResult> Put([FromForm] Propietario p) {
+        public async Task<IActionResult> Put([FromBody] Propietario p) {
             try
             {
                 if (ModelState.IsValid)

@@ -24,7 +24,7 @@ namespace Lab3InmibiliariaVisual.Models
 		public Propietario? Duenio { get; set; }
 
 		[Display(Name = "Tipo Inmueble")]
-		public string? Tipo {get; set;}
+		public int  TipoId {get; set;}
         
 		[Display(Name = "Importe")]
 		public int Importe {get; set;}
@@ -32,6 +32,6 @@ namespace Lab3InmibiliariaVisual.Models
 		[Display(Name = "Disponible")]
 		public int Disponible {get; set;}
 
-		public string? Disp {get; set;}
+		//public string? Disp {get; set;}
     }
 }

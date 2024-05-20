@@ -28,7 +28,7 @@ namespace Lab3InmibiliariaVisual.Models
 
         public int Est {get; set;}
 
-        [DisplayName("Estado")]
-        public string? Activo {get; set;}
+        /*[DisplayName("Estado")]
+        public string? Activo {get; set;}*/
     }
 }
