@@ -28,7 +28,7 @@ namespace Lab3InmibiliariaVisual.Controllers
                                     .Include(x => x.Inquilino)
                                     .Include(x => x.Inmueble)
                                     .Where(x => x.Inmueble.Duenio.Email == usuario)
-                                    .SingleOrDefaultAsync(x => x.IdContrato == id);
+                                    .SingleOrDefaultAsync(x => x.Id == id);
                 return contrato != null ? Ok(contrato) : NotFound();
             }
             catch (Exception ex)

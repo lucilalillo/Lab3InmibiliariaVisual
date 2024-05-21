@@ -7,7 +7,7 @@ namespace Lab3InmibiliariaVisual.Models
     {
         [Key]
         [DisplayName("Código de Pago")]
-        public int IdPago { get; set; }
+        public int Id { get; set; }
 
         [DisplayName("Número de pago")]
         public int NumPago { get; set; }

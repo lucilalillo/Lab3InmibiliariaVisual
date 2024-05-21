@@ -6,7 +6,7 @@ namespace Lab3InmibiliariaVisual.Models
     {
         [Key]
 		[Display(Name = "Código Interno")]
-		public int IdPropietario { get; set; }
+		public int Id { get; set; }
 		[Required]
 		public string? Nombre { get; set; }
 		[Required]
@@ -20,9 +20,9 @@ namespace Lab3InmibiliariaVisual.Models
 		[Required, DataType(DataType.Password)]
 		public string? Clave { get; set; }
 
-		public override string ToString()
+		/*public override string ToString()
 		{
 			return $"{Nombre} {Apellido}";
-		}
+		}*/
     }
 }

@@ -48,7 +48,7 @@ namespace Lab3InmibiliariaVisual.Controllers
             try
             {
                 var usuario = User.Identity.Name;
-                return Ok(contexto.Inmuebles.Include(e => e.Duenio).Where(e => e.Duenio.Email == usuario).Single(e => e.IdInmueble == id));
+                return Ok(contexto.Inmuebles.Include(e => e.Duenio).Where(e => e.Duenio.Email == usuario).Single(e => e.Id == id));
             }
             catch (Exception ex)
             {
@@ -94,7 +94,7 @@ namespace Lab3InmibiliariaVisual.Controllers
 
                 var query = from inmu in contexto.Inmuebles
                               join cont in contexto.Contratos
-                                on inmu.IdInmueble equals cont.InmuebleId
+                                on inmu.Id equals cont.InmuebleId
                             where cont.FecInicio <= fecha_actual && cont.FecFin >= fecha_actual && usuario == inmu.Duenio.Email
                             select cont;
              return Ok(query);

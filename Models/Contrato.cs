@@ -5,7 +5,7 @@ namespace Lab3InmibiliariaVisual.Models{
     {
         [Key]
         [Display(Name = "Codigo")]
-        public int IdContrato { get; set; }
+        public int Id { get; set; }
 
         public Inmueble? Inmueble { get; set; }
 

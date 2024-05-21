@@ -6,7 +6,7 @@ namespace Lab3InmibiliariaVisual.Models
     {
         [Key]
         [Display(Name = "Código Interno")]
-		public int IdInmueble { get; set; }
+		public int Id { get; set; }
 		[Required]
 		[Display(Name = "Dirección")]
 		public string? Direccion { get; set; }
