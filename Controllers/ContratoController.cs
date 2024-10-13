@@ -46,7 +46,6 @@ namespace Lab3InmibiliariaVisual.Controllers
                 var lista = await contexto.Contratos
                                 .Include(x => x.Inquilino)
                                 .Include(x => x.Inmueble)
-                               // .Include(x=> x.Garante)
                                 .Where(x => x.Inmueble.Duenio.Email == usuario).ToListAsync();
                 return Ok(lista);
             }

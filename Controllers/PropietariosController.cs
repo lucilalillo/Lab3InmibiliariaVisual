@@ -49,8 +49,6 @@ namespace Lab3InmibiliariaVisual.Controllers
             Propietario p = null;
             try
             {
-               
-
                 string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                     password: login.Clave,
                     salt: System.Text.Encoding.ASCII.GetBytes(config["Salt"]),
