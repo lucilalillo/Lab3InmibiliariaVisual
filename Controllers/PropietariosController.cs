@@ -92,7 +92,7 @@ namespace Lab3InmibiliariaVisual.Controllers
         //edita los datos del propietario logueado
         [HttpPut()]
         public async Task<IActionResult> Put([FromBody] Propietario p) {
-            try
+            /*try
             {
                 if (ModelState.IsValid)
                 {
@@ -100,6 +100,27 @@ namespace Lab3InmibiliariaVisual.Controllers
                     await contexto.SaveChangesAsync();
                     return Ok(p);
                  }
+                 Console.WriteLine("despues del if");
+                return BadRequest();
+            }*/
+             try
+            {
+                if (ModelState.IsValid)
+                {
+                    
+                    var propietario = await contexto.Propietarios.AsNoTracking()
+                        .FirstOrDefaultAsync(x => x.Email == p.Email);
+                    if(p.Clave == null)
+                    {
+                        p.Clave = propietario.Clave; 
+                    }
+                    
+                    p.Id = propietario.Id;
+                    contexto.Propietarios.Update(p);
+                    await contexto.SaveChangesAsync();
+                    return Ok(p);
+                }
+                Console.WriteLine("despues del if");
                 return BadRequest();
             }
             catch (Exception ex) {

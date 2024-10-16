@@ -23,7 +23,7 @@ namespace Lab3InmibiliariaVisual.Models{
         [Required, Display(Name ="Fecha Fin contrato")]
         public DateTime FecFin { get; set; }
 
-        public decimal Monto { get; set; }
+        public decimal monto { get; set; }
 
         public bool Estado { get; set; }
     }

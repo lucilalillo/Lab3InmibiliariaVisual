@@ -55,7 +55,7 @@ namespace Lab3InmibiliariaVisual.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        /*/
+        
         //Put api/Inmuebles/EditarEstado/5
         //Para cambiar el estado entre disponible y no disponible
      
@@ -66,9 +66,11 @@ namespace Lab3InmibiliariaVisual.Controllers
             {
                 var usuario = User.Identity.Name;
                 var i = contexto.Inmuebles.Include(x => x.Duenio)
-                    .FirstOrDefault(x => x.IdInmueble == id && x.Duenio.Email == usuario);
+                    .FirstOrDefault(x => x.Id == id && x.Duenio.Email == usuario);
                 if (i != null) { 
-                    i.Disponible = !i.Disponible;
+                    if(i.Disponible == 1)
+                    { i.Disponible = 0; }
+                    else {i.Disponible = 1; }
                     contexto.Inmuebles.Update(i);
                     await contexto.SaveChangesAsync();
                     return Ok(i);
@@ -80,7 +82,7 @@ namespace Lab3InmibiliariaVisual.Controllers
             {
                 return BadRequest(ex.Message.ToString());
             }
-        } /*/
+        } 
 
        //este metodo se usa en la vista Inquilinos
        //Me devuelve una lista con los inmuebles alquilados del usuario actual
