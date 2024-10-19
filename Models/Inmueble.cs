@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Lab3InmibiliariaVisual.Models
 {
@@ -31,6 +33,11 @@ namespace Lab3InmibiliariaVisual.Models
 
 		[Display(Name = "Disponible")]
 		public int Disponible {get; set;}
+
+		public string? imgUrl {get; set;}
+       
+	    [NotMapped]
+        public IFormFile imagen { get; set;}
 
 		//public string? Disp {get; set;}
     }

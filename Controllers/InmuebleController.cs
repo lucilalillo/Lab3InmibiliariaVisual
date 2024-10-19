@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace Lab3InmibiliariaVisual.Controllers
 {
@@ -107,9 +109,50 @@ namespace Lab3InmibiliariaVisual.Controllers
             }
         }
 
+        // crear nuevo inmueble del propietario logueado.
+        [HttpPost]
+        public async Task<IActionResult> Post([FromForm] Inmueble inmueble){
+            try{
+              if(ModelState.IsValid){
+                inmueble.PropietarioId =  contexto.Propietarios.Single(x=>x.Email== User.Identity.Name).Id;
+                contexto.Inmuebles.Add(inmueble);
+                await contexto.SaveChangesAsync();
+                Console.WriteLine("inmueble.imagen: " + inmueble.imagen);
+                if (inmueble.imagen != null && inmueble.Id > 0)
+				{
+					string wwwPath = environment.WebRootPath;
+					string path = Path.Combine(wwwPath, "Uploads");
+					if (!Directory.Exists(path))
+					{
+						Directory.CreateDirectory(path);
+					}
+					
+					string fileName = "inmueble_" + inmueble.Id + Path.GetExtension(inmueble.imagen.FileName);
+					string pathCompleto = Path.Combine(path, fileName);
+					inmueble.imgUrl = Path.Combine("/Uploads", fileName);
+					// Esta operación guarda la foto en memoria en la ruta que necesitamos
+					using (FileStream stream = new FileStream(pathCompleto, FileMode.Create))
+					{
+						inmueble.imagen.CopyTo(stream);
+					}
+					contexto.inmuebles.Update(inmueble);
+				}
+                
+                return CreatedAtAction(nameof(GetInmueblePorId), new { id = inmueble.Id }, inmueble);
+            }
+            else {
+                return BadRequest("Model State no es valido.");
+            }
+            }catch (Exception ex){
+                return BadRequest(ex.InnerException?.Message ?? ex.Message);
+            }
+
+        }
+
         // POST api/<controller>
         //este metodo envia la foto del inmueble
-       /* [HttpPost]
+       
+       /*[HttpPost]
        public async Task<IActionResult> Post([FromBody] Inmueble entidad)
         {
             try
@@ -154,6 +197,44 @@ namespace Lab3InmibiliariaVisual.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message.ToString());
+            }
+        }*/
+
+        //funcion asincrona para guardar la imagen y modificarle tamaño.
+      /* public async Task<string> guardarImagen(Inmueble entidad)
+        {
+            Console.WriteLine("inmueble: " + entidad);
+            try
+            {
+                Console.WriteLine("dentro del try ");
+                string wwwPath = environment.WebRootPath;
+                string path = Path.Combine(wwwPath, "uploads");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                string fileName = "inmueble_" + entidad.Id + Path.GetExtension(entidad.imagen.FileName);
+                Console.WriteLine("Filename: " + fileName);
+                string pathCompleto = Path.Combine(path, fileName);
+                
+                // Esta operación guarda la foto en memoria en la ruta que necesitamos
+                using (FileStream stream = new FileStream(pathCompleto, FileMode.Create))
+                {
+                    await entidad.imagen.CopyToAsync(stream);
+                    stream.Dispose();
+                }
+                using (var image = Image.Load(pathCompleto))
+                {
+                    image.Mutate(x => x.Resize(500, 500));
+                    var resizedImagePath = Path.Combine(environment.WebRootPath, "uploads", Path.GetFileName(fileName));
+                    image.Save(resizedImagePath);
+                    return Path.Combine("uploads", Path.GetFileName(pathCompleto)).Replace("\\", "/");
+                }
+                   
+            }
+            catch (Exception ex)
+            {
+                return "Error";
             }
         }*/
     }
