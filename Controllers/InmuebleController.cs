@@ -70,9 +70,7 @@ namespace Lab3InmibiliariaVisual.Controllers
                 var i = contexto.Inmuebles.Include(x => x.Duenio)
                     .FirstOrDefault(x => x.Id == id && x.Duenio.Email == usuario);
                 if (i != null) { 
-                    if(i.Disponible == 1)
-                    { i.Disponible = 0; }
-                    else {i.Disponible = 1; }
+                    i.Disponible = !i.Disponible;
                     contexto.Inmuebles.Update(i);
                     await contexto.SaveChangesAsync();
                     return Ok(i);
@@ -109,8 +107,65 @@ namespace Lab3InmibiliariaVisual.Controllers
             }
         }
 
-        // crear nuevo inmueble del propietario logueado.
         [HttpPost]
+        public async Task<IActionResult> Post([FromForm] Inmueble inmueble){
+            try{
+                 inmueble.PropietarioId =  contexto.Propietarios.Single(x=>x.Email == User.Identity.Name).Id;
+                 if(ModelState.IsValid){
+                    await contexto.Inmuebles.AddAsync(inmueble);
+                    contexto.SaveChangesAsync();
+                    if(inmueble.imagen!=null){
+                        var imagePath = await guardarImagen(inmueble);
+                        inmueble.imgUrl = imagePath;
+                        await contexto.SaveChangesAsync();
+                    }
+                    
+                    return CreatedAtAction(nameof(GetInmueblePorId), new { id = inmueble.Id }, inmueble);
+                }
+                
+                return BadRequest("Model State no es valido.");
+            
+            }catch (Exception ex){
+                return BadRequest(ex.InnerException?.Message ?? ex.Message);
+            }
+
+        }
+
+        //funcion asincrona para guardar la imagen y modificarle tamaño.
+       public async Task<string> guardarImagen(Inmueble entidad)
+        {
+            try
+            {
+                string wwwPath = environment.WebRootPath;
+                string path = Path.Combine(wwwPath, "uploads");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                string fileName = "inmueble_" + entidad.Id + Path.GetExtension(entidad.imagen.FileName);
+                string pathCompleto = Path.Combine(path, fileName);
+                
+                // Esta operación guarda la foto en memoria en la ruta que necesitamos
+                using (FileStream stream = new FileStream(pathCompleto, FileMode.Create))
+                {
+                    await entidad.imagen.CopyToAsync(stream);
+                    stream.Dispose();
+                }
+                using (var image = Image.Load(pathCompleto))
+                {
+                    image.Mutate(x => x.Resize(500, 500));
+                    var resizedImagePath = Path.Combine(environment.WebRootPath, "uploads", Path.GetFileName(fileName));
+                    image.Save(resizedImagePath);
+                    return Path.Combine("uploads", Path.GetFileName(pathCompleto)).Replace("\\", "/");
+                }
+            }
+            catch (Exception ex)
+            {
+                return "Excepcion en cargar imagen";
+            }
+        }
+        // crear nuevo inmueble del propietario logueado.
+        /*[HttpPost]
         public async Task<IActionResult> Post([FromForm] Inmueble inmueble){
             try{
               if(ModelState.IsValid){
@@ -147,12 +202,12 @@ namespace Lab3InmibiliariaVisual.Controllers
                 return BadRequest(ex.InnerException?.Message ?? ex.Message);
             }
 
-        }
+        }*/
 
         // POST api/<controller>
         //este metodo envia la foto del inmueble
-       
-       /*[HttpPost]
+       /*
+       [HttpPost]
        public async Task<IActionResult> Post([FromBody] Inmueble entidad)
         {
             try
@@ -160,29 +215,29 @@ namespace Lab3InmibiliariaVisual.Controllers
                 var direccion = entidad.Direccion;
                 var duenioId = User.Identity.Name;
 
-                if (entidad.Imagen.Length > 0)
+                if (entidad.imagen.Length > 0)
                 {
                     if (ModelState.IsValid)
                     {
-                        entidad.Id = contexto.Propietarios.Single(e => e.Mail == User.Identity.Name).Id;
+                        entidad.Id = contexto.Propietarios.Single(e => e.Email == User.Identity.Name).Id;
  
-                        var stream1 = new MemoryStream(Convert.FromBase64String(entidad.Imagen));
+                        var stream1 = new MemoryStream(Convert.FromBase64String(entidad.imagen));
                         IFormFile ImagenInmo = new FormFile(stream1, 0, stream1.Length, "inmueble", ".jpg");
                         string wwwPath = environment.WebRootPath;
-                        string path = Path.Combine(wwwPath, "Uploads");
+                        string path = Path.Combine(wwwPath, "imagenes");
                         if (!Directory.Exists(path))
                         {
                             Directory.CreateDirectory(path);
                         }
                         Random r = new Random();
                         //Path.GetFileName(u.AvatarFile.FileName);//este nombre se puede repetir
-                        string fileName = "foto_"+entidad.Id+Path.GetExtension(entidad.ImagenFile.FileName);
+                        string fileName = "foto_" + entidad.Id + Path.GetExtension(entidad.imagen.FileName);
                         string pathCompleto = Path.Combine(path, fileName);
 
-                        entidad.Imagen = Path.Combine("/Uploads", fileName);
+                        entidad.imagen = Path.Combine("/imagenes", fileName);
                         using (FileStream stream = new FileStream(pathCompleto, FileMode.Create))
                         {
-                            entidad.ImagenFile.CopyTo(stream);
+                            entidad.imagen.CopyTo(stream);
                         }
                         
                         contexto.Inmuebles.Add(entidad);
@@ -197,44 +252,6 @@ namespace Lab3InmibiliariaVisual.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message.ToString());
-            }
-        }*/
-
-        //funcion asincrona para guardar la imagen y modificarle tamaño.
-      /* public async Task<string> guardarImagen(Inmueble entidad)
-        {
-            Console.WriteLine("inmueble: " + entidad);
-            try
-            {
-                Console.WriteLine("dentro del try ");
-                string wwwPath = environment.WebRootPath;
-                string path = Path.Combine(wwwPath, "uploads");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                string fileName = "inmueble_" + entidad.Id + Path.GetExtension(entidad.imagen.FileName);
-                Console.WriteLine("Filename: " + fileName);
-                string pathCompleto = Path.Combine(path, fileName);
-                
-                // Esta operación guarda la foto en memoria en la ruta que necesitamos
-                using (FileStream stream = new FileStream(pathCompleto, FileMode.Create))
-                {
-                    await entidad.imagen.CopyToAsync(stream);
-                    stream.Dispose();
-                }
-                using (var image = Image.Load(pathCompleto))
-                {
-                    image.Mutate(x => x.Resize(500, 500));
-                    var resizedImagePath = Path.Combine(environment.WebRootPath, "uploads", Path.GetFileName(fileName));
-                    image.Save(resizedImagePath);
-                    return Path.Combine("uploads", Path.GetFileName(pathCompleto)).Replace("\\", "/");
-                }
-                   
-            }
-            catch (Exception ex)
-            {
-                return "Error";
             }
         }*/
     }

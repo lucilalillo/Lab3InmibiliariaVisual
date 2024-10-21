@@ -25,19 +25,20 @@ namespace Lab3InmibiliariaVisual.Models
 		public int PropietarioId { get; set; }
 		public Propietario? Duenio { get; set; }
 
-		[Display(Name = "Tipo Inmueble")]
 		public int  TipoId {get; set;}
         
-		[Display(Name = "Importe")]
-		public int Importe {get; set;}
+		public int? Importe {get; set;}
 
-		[Display(Name = "Disponible")]
-		public int Disponible {get; set;}
+		public bool Disponible {get; set;}
 
 		public string? imgUrl {get; set;}
        
 	    [NotMapped]
         public IFormFile imagen { get; set;}
+
+		[NotMapped]
+		[ForeignKey(nameof(TipoId))]
+		public Tipo Tipo {get; set;}
 
 		//public string? Disp {get; set;}
     }
