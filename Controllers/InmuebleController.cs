@@ -33,7 +33,7 @@ namespace Lab3InmibiliariaVisual.Controllers
             try
             {
                 var usuario = User.Identity.Name;
-                return Ok(contexto.Inmuebles.Include(e => e.Duenio).Where(e => e.Duenio.Email == usuario));
+                return Ok(contexto.Inmuebles.Include(e => e.Duenio).Include(e => e.Tipo).Where(e => e.Duenio.Email == usuario));
             }
             catch (Exception ex)
             {
@@ -111,6 +111,7 @@ namespace Lab3InmibiliariaVisual.Controllers
         public async Task<IActionResult> Post([FromForm] Inmueble inmueble){
             try{
                  inmueble.PropietarioId =  contexto.Propietarios.Single(x=>x.Email == User.Identity.Name).Id;
+                //no trae el Id de Inmueble
                  if(ModelState.IsValid){
                     await contexto.Inmuebles.AddAsync(inmueble);
                     contexto.SaveChangesAsync();

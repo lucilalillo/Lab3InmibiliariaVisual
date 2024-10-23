@@ -36,7 +36,6 @@ namespace Lab3InmibiliariaVisual.Models
 	    [NotMapped]
         public IFormFile imagen { get; set;}
 
-		[NotMapped]
 		[ForeignKey(nameof(TipoId))]
 		public Tipo Tipo {get; set;}
 

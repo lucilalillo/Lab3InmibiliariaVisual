@@ -116,5 +116,41 @@ namespace Lab3InmibiliariaVisual.Controllers
                 return BadRequest(ex.Message.ToString());
             }
         }
+
+        //editar contraseña
+        [HttpPatch("cambiarPass")]
+		public async Task<IActionResult> CambiarPass([FromForm] String clVieja, String clNueva ){
+		
+			var user = User.Identity.Name;
+            var propietario = await contexto.Propietarios.FirstOrDefaultAsync(u=>u.Email==user);
+			string hashed =  Hashear(clVieja);
+			try{
+                if(propietario.Clave==hashed){
+                    clNueva = Hashear(clNueva);
+                    propietario.Clave = clNueva;
+                    contexto.Propietarios.Update(propietario);
+                    await contexto.SaveChangesAsync();
+                    
+                }
+            
+                return Ok(propietario);
+            }catch(Exception ex){
+                return BadRequest(ex.Message.ToString());
+            }
+			
+		}
+
+
+        //funcion para hashear clave
+        private String Hashear(String clave){
+           clave =  Convert.ToBase64String(KeyDerivation.Pbkdf2(
+							password: clave,
+							salt: System.Text.Encoding.ASCII.GetBytes(config["Salt"]),
+							prf: KeyDerivationPrf.HMACSHA1,
+							iterationCount: 1000,
+							numBytesRequested: 256 / 8));
+            return (clave);
+
+        }
     }
 }
