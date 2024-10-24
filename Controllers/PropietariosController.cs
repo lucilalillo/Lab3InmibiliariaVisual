@@ -123,9 +123,9 @@ namespace Lab3InmibiliariaVisual.Controllers
 		
 			var user = User.Identity.Name;
             var propietario = await contexto.Propietarios.FirstOrDefaultAsync(u=>u.Email==user);
-			string hashed =  Hashear(clVieja);
+			string hashed = Hashear(clVieja);
 			try{
-                if(propietario.Clave==hashed){
+                if(propietario.Clave == hashed){
                     clNueva = Hashear(clNueva);
                     propietario.Clave = clNueva;
                     contexto.Propietarios.Update(propietario);
@@ -134,12 +134,11 @@ namespace Lab3InmibiliariaVisual.Controllers
                 }
             
                 return Ok(propietario);
-            }catch(Exception ex){
+            }
+            catch(Exception ex){
                 return BadRequest(ex.Message.ToString());
             }
-			
 		}
-
 
         //funcion para hashear clave
         private String Hashear(String clave){

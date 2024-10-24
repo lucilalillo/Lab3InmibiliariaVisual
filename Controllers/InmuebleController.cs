@@ -106,31 +106,44 @@ namespace Lab3InmibiliariaVisual.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-        [HttpPost]
+        // crear nuevo inmueble del propietario logueado.
+        [HttpPost] //No funciona!!!!
         public async Task<IActionResult> Post([FromForm] Inmueble inmueble){
             try{
-                 inmueble.PropietarioId =  contexto.Propietarios.Single(x=>x.Email == User.Identity.Name).Id;
-                //no trae el Id de Inmueble
-                 if(ModelState.IsValid){
-                    await contexto.Inmuebles.AddAsync(inmueble);
-                    contexto.SaveChangesAsync();
-                    if(inmueble.imagen!=null){
-                        var imagePath = await guardarImagen(inmueble);
-                        inmueble.imgUrl = imagePath;
-                        await contexto.SaveChangesAsync();
-                    }
-                    
-                    return CreatedAtAction(nameof(GetInmueblePorId), new { id = inmueble.Id }, inmueble);
+                
+            inmueble.PropietarioId =  contexto.Propietarios.Single(x=>x.Email== User.Identity.Name).Id;
+            Console.WriteLine("inmueble: " + "PropietarioId: " +inmueble.PropietarioId+ " "+
+                                   "Ambientes: " + inmueble.Ambientes+ " "+
+                                   "Superficie: "+ inmueble.Superficie+ " "+
+                                   "Direccion: " + inmueble.Direccion+ " "+
+                                   "Longitud: "+ inmueble.Longitud+ " "+
+                                   "Latitud: "+inmueble.Latitud+ " "+
+                                   "Uso: "+inmueble.Uso+ " "+
+                                   "Importe: "+inmueble.Importe+ " "+
+                                   "TipoId: "+inmueble.TipoId+ " "+
+                                   "ImgUrl: "+inmueble.imgUrl+ " "+
+                                   "Disponible: "+inmueble.Disponible+ " "+
+                                   "Tipo: "+inmueble.Tipo);
+            if(ModelState.IsValid){
+               
+                contexto.Inmuebles.Add(inmueble);
+                await contexto.SaveChangesAsync();
+                if(inmueble.imagen!=null){
+                    var imagePath = await guardarImagen(inmueble);
+                    inmueble.imgUrl = imagePath;
+                    await contexto.SaveChangesAsync();
                 }
                 
+                return CreatedAtAction(nameof(GetInmueblePorId), new { id = inmueble.Id }, inmueble);
+            }
+            else {
                 return BadRequest("Model State no es valido.");
-            
+            }
             }catch (Exception ex){
                 return BadRequest(ex.InnerException?.Message ?? ex.Message);
             }
 
-        }
+        }    
 
         //funcion asincrona para guardar la imagen y modificarle tamaño.
        public async Task<string> guardarImagen(Inmueble entidad)
@@ -165,45 +178,6 @@ namespace Lab3InmibiliariaVisual.Controllers
                 return "Excepcion en cargar imagen";
             }
         }
-        // crear nuevo inmueble del propietario logueado.
-        /*[HttpPost]
-        public async Task<IActionResult> Post([FromForm] Inmueble inmueble){
-            try{
-              if(ModelState.IsValid){
-                inmueble.PropietarioId =  contexto.Propietarios.Single(x=>x.Email== User.Identity.Name).Id;
-                contexto.Inmuebles.Add(inmueble);
-                await contexto.SaveChangesAsync();
-                Console.WriteLine("inmueble.imagen: " + inmueble.imagen);
-                if (inmueble.imagen != null && inmueble.Id > 0)
-				{
-					string wwwPath = environment.WebRootPath;
-					string path = Path.Combine(wwwPath, "Uploads");
-					if (!Directory.Exists(path))
-					{
-						Directory.CreateDirectory(path);
-					}
-					
-					string fileName = "inmueble_" + inmueble.Id + Path.GetExtension(inmueble.imagen.FileName);
-					string pathCompleto = Path.Combine(path, fileName);
-					inmueble.imgUrl = Path.Combine("/Uploads", fileName);
-					// Esta operación guarda la foto en memoria en la ruta que necesitamos
-					using (FileStream stream = new FileStream(pathCompleto, FileMode.Create))
-					{
-						inmueble.imagen.CopyTo(stream);
-					}
-					contexto.inmuebles.Update(inmueble);
-				}
-                
-                return CreatedAtAction(nameof(GetInmueblePorId), new { id = inmueble.Id }, inmueble);
-            }
-            else {
-                return BadRequest("Model State no es valido.");
-            }
-            }catch (Exception ex){
-                return BadRequest(ex.InnerException?.Message ?? ex.Message);
-            }
-
-        }*/
 
         // POST api/<controller>
         //este metodo envia la foto del inmueble
