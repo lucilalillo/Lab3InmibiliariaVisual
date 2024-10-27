@@ -112,18 +112,7 @@ namespace Lab3InmibiliariaVisual.Controllers
             try{
                 
             inmueble.PropietarioId =  contexto.Propietarios.Single(x=>x.Email== User.Identity.Name).Id;
-            Console.WriteLine("inmueble: " + "PropietarioId: " +inmueble.PropietarioId+ " "+
-                                   "Ambientes: " + inmueble.Ambientes+ " "+
-                                   "Superficie: "+ inmueble.Superficie+ " "+
-                                   "Direccion: " + inmueble.Direccion+ " "+
-                                   "Longitud: "+ inmueble.Longitud+ " "+
-                                   "Latitud: "+inmueble.Latitud+ " "+
-                                   "Uso: "+inmueble.Uso+ " "+
-                                   "Importe: "+inmueble.Importe+ " "+
-                                   "TipoId: "+inmueble.TipoId+ " "+
-                                   "ImgUrl: "+inmueble.imgUrl+ " "+
-                                   "Disponible: "+inmueble.Disponible+ " "+
-                                   "Tipo: "+inmueble.Tipo);
+            
             if(ModelState.IsValid){
                
                 contexto.Inmuebles.Add(inmueble);
