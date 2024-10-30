@@ -111,8 +111,12 @@ namespace Lab3InmibiliariaVisual.Controllers
         public async Task<IActionResult> Post([FromForm] Inmueble inmueble){
             try{
                 
-            inmueble.PropietarioId =  contexto.Propietarios.Single(x=>x.Email== User.Identity.Name).Id;
-            
+         
+        
+       inmueble.PropietarioId =  contexto.Propietarios.Single(x=>x.Email== User.Identity.Name).Id;
+       inmueble.imgUrl = "asd";
+       inmueble.Tipo = contexto.Tipos.Single(x=>x.Id == inmueble.TipoId);    
+
             if(ModelState.IsValid){
                
                 contexto.Inmuebles.Add(inmueble);
@@ -121,6 +125,7 @@ namespace Lab3InmibiliariaVisual.Controllers
                     var imagePath = await guardarImagen(inmueble);
                     inmueble.imgUrl = imagePath;
                     await contexto.SaveChangesAsync();
+                    inmueble.imagen = null;
                 }
                 
                 return CreatedAtAction(nameof(GetInmueblePorId), new { id = inmueble.Id }, inmueble);
