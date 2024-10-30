@@ -107,7 +107,7 @@ namespace Lab3InmibiliariaVisual.Controllers
             }
         }
         // crear nuevo inmueble del propietario logueado.
-        [HttpPost] //No funciona!!!!
+        [HttpPost]
         public async Task<IActionResult> Post([FromForm] Inmueble inmueble){
             try{
                 
@@ -173,55 +173,6 @@ namespace Lab3InmibiliariaVisual.Controllers
             }
         }
 
-        // POST api/<controller>
-        //este metodo envia la foto del inmueble
-       /*
-       [HttpPost]
-       public async Task<IActionResult> Post([FromBody] Inmueble entidad)
-        {
-            try
-            {
-                var direccion = entidad.Direccion;
-                var duenioId = User.Identity.Name;
-
-                if (entidad.imagen.Length > 0)
-                {
-                    if (ModelState.IsValid)
-                    {
-                        entidad.Id = contexto.Propietarios.Single(e => e.Email == User.Identity.Name).Id;
- 
-                        var stream1 = new MemoryStream(Convert.FromBase64String(entidad.imagen));
-                        IFormFile ImagenInmo = new FormFile(stream1, 0, stream1.Length, "inmueble", ".jpg");
-                        string wwwPath = environment.WebRootPath;
-                        string path = Path.Combine(wwwPath, "imagenes");
-                        if (!Directory.Exists(path))
-                        {
-                            Directory.CreateDirectory(path);
-                        }
-                        Random r = new Random();
-                        //Path.GetFileName(u.AvatarFile.FileName);//este nombre se puede repetir
-                        string fileName = "foto_" + entidad.Id + Path.GetExtension(entidad.imagen.FileName);
-                        string pathCompleto = Path.Combine(path, fileName);
-
-                        entidad.imagen = Path.Combine("/imagenes", fileName);
-                        using (FileStream stream = new FileStream(pathCompleto, FileMode.Create))
-                        {
-                            entidad.imagen.CopyTo(stream);
-                        }
-                        
-                        contexto.Inmuebles.Add(entidad);
-                        contexto.SaveChanges();
-                        return CreatedAtAction(nameof(GetInmueblePorId), new { id = entidad.Id }, entidad);
-
-                    }
-                    return BadRequest(ModelState);
-                }
-                return BadRequest(Ok("Imagen no encontrada"));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message.ToString());
-            }
-        }*/
+       
     }
 }
