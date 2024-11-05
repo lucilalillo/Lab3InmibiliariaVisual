@@ -171,7 +171,8 @@ namespace Lab3InmibiliariaVisual.Controllers
 		public async Task<IActionResult> Token()
 		{
 			try
-			{ //este método si tiene autenticación, al entrar, generar clave aleatorio y enviarla por correo
+			{ 
+				//este método si tiene autenticación, al entrar, generar clave aleatorio y enviarla por correo
 				var perfil = new
 				{
 					Email = User.Identity.Name,
@@ -179,23 +180,29 @@ namespace Lab3InmibiliariaVisual.Controllers
 					Rol = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role).Value
 				};
 				Random rand = new Random(Environment.TickCount);
-				string randomChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789";
+				string randomChars = "ABCDEFGHJKLMNOPQRSTUVWXYZ0123456789";
 				string nuevaClave = "";
-				for (int i = 0; i < 8; i++)
+				for (int i = 0; i < 6; i++)
 				{
 					nuevaClave += randomChars[rand.Next(0, randomChars.Length)];
-				}//!Falta hacer el hash a la clave y actualizar el usuario con dicha clave
+				}
+                //!Falta hacer el hash a la clave y actualizar el usuario con dicha clave
+                var claveHasheada = Hashear(nuevaClave);
+                Propietario p = await contexto.Propietarios.SingleOrDefaultAsync(x => x.Email == perfil.Email);
+                p.Clave = claveHasheada;
+                contexto.Propietarios.Update(p);
+                contexto.SaveChanges();
 				var message = new MimeKit.MimeMessage();
 				message.To.Add(new MailboxAddress(perfil.Nombre, perfil.Email));
-				message.From.Add(new MailboxAddress("Inmobiliaria Lillo", config["SMTPUser"]));
-				message.Subject = "Prueba de Correo desde API";
+				message.From.Add(new MailboxAddress("Inmobiliaria Ledesma", config["SMTPUser"]));
+				message.Subject = "Envio de nueva contraseña";
 				message.Body = new TextPart("html")
 				{
 					Text = @$"<h1>Hola</h1>
-					<p>¡Bienvenido, {perfil.Nombre}!</p>",//falta enviar la clave generada (sin hashear)
+					<p> {perfil.Nombre} Tu nueva contraseña es: {nuevaClave} </p>",//falta enviar la clave generada (sin hashear)
 				};
 				message.Headers.Add("Encabezado", "Valor");//solo si hace falta
-				message.Headers.Add("Otro", config["Valor"]);//otro ejemplo
+			//	message.Headers.Add("Otro", config["Valor"]);//otro ejemplo
 				MailKit.Net.Smtp.SmtpClient client = new SmtpClient();
 				client.ServerCertificateValidationCallback = (object sender,
 					System.Security.Cryptography.X509Certificates.X509Certificate certificate,
@@ -221,13 +228,52 @@ namespace Lab3InmibiliariaVisual.Controllers
 			try
 			{ //método sin autenticar, busca el propietario x email
 				var entidad = await contexto.Propietarios.FirstOrDefaultAsync(x => x.Email == email);
+               var key = new SymmetricSecurityKey(
+                            System.Text.Encoding.ASCII.GetBytes(config["TokenAuthentication:SecretKey"]));
+                        var credenciales = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                        var claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Name, entidad.Email),
+                            new Claim("FullName", entidad.Nombre + " " + entidad.Apellido),
+                            new Claim(ClaimTypes.Role, "Propietario"),
+                        };
+
+                        var token = new JwtSecurityToken(
+                            issuer: config["TokenAuthentication:Issuer"],
+                            audience: config["TokenAuthentication:Audience"],
+                            claims: claims,
+                            expires: DateTime.Now.AddDays(360),
+                            signingCredentials: credenciales
+                        );
+                        var vToken = new JwtSecurityTokenHandler().WriteToken(token);
 				//para hacer: si el propietario existe, mandarle un email con un enlace con el token
 				//ese enlace servirá para resetear la contraseña
 				//Dominio sirve para armar el enlace, en local será la ip y en producción será el dominio www...
 				var url = this.GenerarUrlCompleta("Token", "Propietarios", environment);
-				var dominio = environment.IsDevelopment() ? HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString() : "www.misitio.com";
+				var dominio = url+"?access_token="+vToken;
 				//añadir: .....?access_token=token
-				return entidad != null ? Ok(entidad) : NotFound();
+                var message = new MimeKit.MimeMessage();
+				message.To.Add(new MailboxAddress(entidad.Nombre, entidad.Email));
+				message.From.Add(new MailboxAddress("Inmobiliaria Ledesma", config["SMTPUser"]));
+				message.Subject = "Link para resetear contraseña";
+				message.Body = new TextPart("html")
+				{
+					Text = @$"<h1>Hola</h1>
+					<p>¡Bienvenido, {entidad.Nombre}! Ingresa al siguiente link para cambiar tu
+                    contraseña</p> href={dominio}",
+				};
+				message.Headers.Add("Encabezado", "Valor");//solo si hace falta
+			//	message.Headers.Add("Otro", config["Valor"]);//otro ejemplo
+				MailKit.Net.Smtp.SmtpClient client = new SmtpClient();
+				client.ServerCertificateValidationCallback = (object sender,
+					System.Security.Cryptography.X509Certificates.X509Certificate certificate,
+					System.Security.Cryptography.X509Certificates.X509Chain chain,
+					System.Net.Security.SslPolicyErrors sslPolicyErrors) =>
+				{ return true; };
+				client.Connect("smtp.gmail.com", 465, MailKit.Security.SecureSocketOptions.Auto);
+				client.Authenticate(config["SMTPUser"], config["SMTPPass"]);//estas credenciales deben estar en el user secrets
+				await client.SendAsync(message);
+				return entidad != null ? Ok("Email enviado.") : NotFound();
 			}
 			catch (Exception ex)
 			{
