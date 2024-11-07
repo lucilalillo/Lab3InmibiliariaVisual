@@ -61,7 +61,7 @@ namespace Lab3InmibiliariaVisual.Controllers
         //Put api/Inmuebles/EditarEstado/5
         //Para cambiar el estado entre disponible y no disponible
      
-        [HttpPut("{id}")] 
+        [HttpPatch("{id}")] 
         public async Task<IActionResult> EditarEstado(int id)
         {
             try

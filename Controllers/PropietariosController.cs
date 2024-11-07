@@ -119,6 +119,12 @@ namespace Lab3InmibiliariaVisual.Controllers
                     }
                     
                     p.Id = propietario.Id;
+                   
+                    if(p.Avatar!=null){
+                        p.AvatarUrl = await guardarImagen(p);
+                    }else{
+                         p.AvatarUrl = propietario.AvatarUrl;
+                    }
                     contexto.Propietarios.Update(p);
                     await contexto.SaveChangesAsync();
                     return Ok(p);
@@ -280,5 +286,41 @@ namespace Lab3InmibiliariaVisual.Controllers
 				return BadRequest(ex.Message);
 			}
 		}
+
+        //funcion asincrona para guardar la imagen y modificarle tamaño.
+       public async Task<string> guardarImagen(Propietario entidad)
+        {
+            try
+            {
+                string wwwPath = environment.WebRootPath;
+                string path = Path.Combine(wwwPath, "uploads");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                string fileName = "avatar_" + entidad.Id + Path.GetExtension(entidad.Avatar.FileName);
+                string pathCompleto = Path.Combine(path, fileName);
+                
+                // Esta operación guarda la foto en memoria en la ruta que necesitamos
+                using (FileStream stream = new FileStream(pathCompleto, FileMode.Create))
+                {
+                    await entidad.Avatar.CopyToAsync(stream);
+                    stream.Dispose();
+                }
+                using (var avatar = Image.Load(pathCompleto))
+                {
+                    avatar.Mutate(x => x.Resize(500, 500));
+                    var resizedImagePath = Path.Combine(environment.WebRootPath, "uploads", Path.GetFileName(fileName));
+                    avatar.Save(resizedImagePath);
+                    return Path.Combine("uploads", Path.GetFileName(pathCompleto)).Replace("\\", "/");
+                }
+                   
+            }
+            catch (Exception ex)
+            {
+                return "Excepcion en cargar imagen";
+            }
+        }
     }
+
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Lab3InmibiliariaVisual.Models
 {
@@ -19,7 +20,11 @@ namespace Lab3InmibiliariaVisual.Models
 		public string? Email { get; set; }
 		[DataType(DataType.Password)]
 		public string? Clave { get; set; }
-		public string? Avatar { get; set; }
+		
+		public string? AvatarUrl { get; set; }
+		
+		[NotMapped]
+		public IFormFile? Avatar {get; set;}
 		/*public override string ToString()
 		{
 			return $"{Nombre} {Apellido}";
