@@ -19,7 +19,7 @@ namespace Lab3InmibiliariaVisual.Controllers
 
         // GET
         //este metodo se usa en la vista de Contratos en el boton pagos
-        //me devuelve la lista de pagos de un contrato vigente
+        //me devuelve la lista de pagos de un contrato
         [HttpGet("{id}")]
         public async Task<ActionResult<List<Pago>>> GetPagos(int id)
         {

@@ -14,12 +14,8 @@ namespace Lab3InmibiliariaVisual.Models
 		public string? Direccion { get; set; }
 		[Required]
 		public int? Ambientes { get; set; }
-		/*[Required]
-		public int Superficie { get; set; }
-		public decimal Latitud { get; set; }*/
 
         public string? Uso {get; set; }
-		//public decimal Longitud { get; set; }
 		
 		public int? PropietarioId { get; set; }
 
@@ -39,7 +35,5 @@ namespace Lab3InmibiliariaVisual.Models
 
 		[ForeignKey(nameof(TipoId))]
 		public Tipo? Tipo {get; set;}
-
-		//public string? Disp {get; set;}
     }
 }

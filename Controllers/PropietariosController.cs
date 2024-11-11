@@ -200,7 +200,7 @@ namespace Lab3InmibiliariaVisual.Controllers
                 contexto.SaveChanges();
 				var message = new MimeKit.MimeMessage();
 				message.To.Add(new MailboxAddress(perfil.Nombre, perfil.Email));
-				message.From.Add(new MailboxAddress("Inmobiliaria Ledesma", config["SMTPUser"]));
+				message.From.Add(new MailboxAddress("Inmobiliaria Lillo", config["SMTPUser"]));
 				message.Subject = "Envio de nueva contraseña";
 				message.Body = new TextPart("html")
 				{
@@ -208,7 +208,6 @@ namespace Lab3InmibiliariaVisual.Controllers
 					<p> {perfil.Nombre} Tu nueva contraseña es: {nuevaClave} </p>",//falta enviar la clave generada (sin hashear)
 				};
 				message.Headers.Add("Encabezado", "Valor");//solo si hace falta
-			//	message.Headers.Add("Otro", config["Valor"]);//otro ejemplo
 				MailKit.Net.Smtp.SmtpClient client = new SmtpClient();
 				client.ServerCertificateValidationCallback = (object sender,
 					System.Security.Cryptography.X509Certificates.X509Certificate certificate,
